@@ -22,7 +22,16 @@
     },
     "reddit.com": {
       name: "Reddit",
-      selectors: ["shreddit-comment div.md", "[id^='t1_'] .md", ".Comment .RichTextJSON-root"],
+      selectors: [
+        "[data-testid='comment'] div > p",
+        ".RichTextJSON-root p",
+        "div[data-click-id='text'] p",
+        "faceplate-tracker[noun='comment'] p",
+        "[id^='t1_'] .md p",
+        ".Comment p",
+        "shreddit-comment p",
+        "div[slot='comment'] p"
+      ],
       usernameSelector: "a[href*='/user/']"
     },
     "instagram.com": {

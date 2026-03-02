@@ -18,8 +18,8 @@ async function ensureOffscreen() {
     try {
       await chrome.offscreen.createDocument({
         url: "offscreen.html",
-        reasons: ["DOM_PARSER"],
-        justification: "TensorFlow.js toxicity model requires DOM environment"
+        reasons: ["BLOBS"],
+        justification: "TensorFlow.js toxicity model requires blob URL support for model weights"
       });
     } catch (e) {
       if (!e.message.includes("Only a single offscreen")) {
@@ -65,6 +65,37 @@ function stripTrackingParams(url) {
   } catch {
     return url;
   }
+}
+
+// ── Keyword Fallback (when TF.js model unavailable) ──
+
+const KEYWORD_RULES = [
+  { words: ["kill yourself", "kys", "hope you die", "end yourself", "go die", "die bitch"], category: "severe_toxicity", score: 0.95 },
+  { words: ["rape", "murder", "gonna kill", "i will kill", "kill you", "beat you", "hurt you", "gonna get you"], category: "threat", score: 0.90 },
+  { words: ["hang", "lynch", "hang the", "string up"], category: "threat", score: 0.80 },
+  { words: ["nigger", "faggot", "terrorist", "go back to your country", "subhuman", "inferior race", "monkey", "ape"], category: "identity_attack", score: 0.92 },
+  { words: ["bitch", "slut", "whore", "hoe", "cunt"], category: "insult", score: 0.85 },
+  { words: ["fuck", "shit", "asshole", "bastard", "dick", "piss off"], category: "obscene", score: 0.75 },
+  { words: ["stupid", "idiot", "moron", "dumb", "worthless", "pathetic", "loser", "scum", "trash", "freak", "ugly", "fat pig"], category: "insult", score: 0.70 },
+  { words: ["hate you", "hate her", "hate him", "hate them", "hate women", "hate men", "hate blacks", "hate whites"], category: "toxicity", score: 0.78 },
+];
+
+function keywordFallbackScores(text) {
+  const lower = text.toLowerCase();
+  const scores = { toxicity: 0, severe_toxicity: 0, threat: 0, identity_attack: 0, insult: 0, obscene: 0 };
+  let anyHit = false;
+
+  for (const rule of KEYWORD_RULES) {
+    for (const word of rule.words) {
+      if (lower.includes(word)) {
+        scores[rule.category] = Math.max(scores[rule.category], rule.score);
+        scores.toxicity = Math.max(scores.toxicity, rule.score * 0.8);
+        anyHit = true;
+      }
+    }
+  }
+
+  return anyHit ? scores : null;
 }
 
 // ── Risk Scoring ──
@@ -207,12 +238,30 @@ async function analyzeBatch(entries) {
     let flagged = tfResult?.flagged || false;
 
     if (!scores || tfResult?.error) {
+      // Try Perspective API first
       const perspScores = await analyzeWithPerspective(entry.text);
       if (perspScores) {
         scores = perspScores;
         flagged = Object.values(perspScores).some(v => v > 0.7);
       } else {
-        continue;
+        // Fall back to keyword detection
+        const kwScores = keywordFallbackScores(entry.text);
+        if (kwScores) {
+          scores = kwScores;
+          flagged = true;
+          console.log("[ALETHEIA BG] Keyword fallback flagged:", entry.text.substring(0, 60));
+        } else {
+          continue;
+        }
+      }
+    }
+
+    // Also apply keyword fallback on top of TF.js to catch anything it misses
+    if (!flagged) {
+      const kwScores = keywordFallbackScores(entry.text);
+      if (kwScores) {
+        scores = kwScores;
+        flagged = true;
       }
     }
 

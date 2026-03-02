@@ -4,3 +4,6 @@ pymongo==4.10.1
 python-dotenv==1.0.1
 reportlab==4.2.5
 python-multipart==0.0.9
+Pillow==10.4.0
+pytesseract==0.3.13
+winocr==0.0.15
