@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ALETHEIA – Upload Evidence</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>ALETHEIA – Upload Evidence</h1>
+      <nav>
+        <a href="index.html">Dashboard</a>
+        <a href="upload.html">Upload Evidence</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="panel">
+        <h2>Upload Screenshot / Image / Video</h2>
+        <form id="upload-form">
+          <label>
+            Platform
+            <select name="platform">
+              <option value="">Select platform</option>
+              <option>Instagram</option>
+              <option>Twitter</option>
+              <option>WhatsApp</option>
+              <option>Facebook</option>
+              <option>Snapchat</option>
+              <option>YouTube</option>
+              <option>Other</option>
+            </select>
+          </label>
+
+          <label>
+            Username
+            <input type="text" name="username" placeholder="@username or phone/email" />
+          </label>
+
+          <label>
+            Context / Message Text (optional)
+            <textarea name="text" rows="4" placeholder="Paste the abusive message or context here"></textarea>
+          </label>
+
+          <label>
+            Evidence File
+            <input type="file" name="file" required />
+          </label>
+
+          <button type="submit">Analyze & Save Incident</button>
+        </form>
+
+        <div id="upload-result" class="result-box hidden"></div>
+      </section>
+    </main>
+
+    <footer>
+      <small>Evidence is analyzed for harassment, unsafe images, and deepfake signals.</small>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
+
