@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from db.mongo import get_db
 from models.incident_model import seed_demo_data
-from routes import analyze, upload, incidents
+from routes import analyze, upload, incidents, extension
 
 
 def create_app() -> FastAPI:
@@ -35,6 +35,7 @@ def create_app() -> FastAPI:
     app.include_router(analyze.router)
     app.include_router(upload.router)
     app.include_router(incidents.router)
+    app.include_router(extension.router)
 
     @app.on_event("startup")
     def _startup():

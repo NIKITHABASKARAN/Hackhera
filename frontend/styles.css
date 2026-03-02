@@ -191,6 +191,104 @@ footer {
   color: #9ca3af;
 }
 
+/* Stats Cards */
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stats-card {
+  background: rgba(16, 24, 48, 0.98);
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+  border: 1px solid rgba(120, 144, 255, 0.24);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.stats-card-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #c7d2ff;
+}
+
+.stats-card-label {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stats-card-ext .stats-card-value { color: #a78bfa; }
+.stats-card-high .stats-card-value { color: #fca5a5; }
+.stats-card-repeat .stats-card-value { color: #fdba74; }
+
+/* Table Header Row */
+.table-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filter-controls select {
+  padding: 0.35rem 0.6rem;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 255, 0.4);
+  color: #c7d2ff;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+/* Source Badges */
+.badge-source {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.badge-source-extension {
+  background: rgba(124, 58, 237, 0.2);
+  color: #c4b5fd;
+}
+
+.badge-source-manual {
+  background: rgba(37, 99, 235, 0.15);
+  color: #93c5fd;
+}
+
+/* Extension Stats Panel */
+.ext-stats-panel {
+  background: linear-gradient(135deg, rgba(16, 24, 48, 0.98), rgba(45, 27, 105, 0.3));
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.ext-stats-row {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.ext-stat {
+  font-size: 0.9rem;
+  color: #d1d5db;
+}
+
+.ext-stat strong {
+  color: #a78bfa;
+}
+
 @media (max-width: 720px) {
   header {
     padding: 1.25rem 1rem;
@@ -203,6 +301,21 @@ footer {
   th,
   td {
     font-size: 0.8rem;
+  }
+
+  .stats-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .table-header-row {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .ext-stats-row {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }
 

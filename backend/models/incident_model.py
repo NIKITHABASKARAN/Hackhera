@@ -17,6 +17,7 @@ class Incident(BaseModel):
     severity: Optional[str] = None
     timestamp: Optional[datetime] = None
     repeat_offender_flag: bool = False
+    source: Optional[str] = "manual"
 
     class Config:
         allow_population_by_field_name = True
@@ -42,6 +43,7 @@ def incident_from_mongo(doc: Dict[str, Any]) -> Dict[str, Any]:
     else:
         data["timestamp"] = None
     data["repeat_offender_flag"] = bool(doc.get("repeat_offender_flag", False))
+    data["source"] = doc.get("source", "manual")
     return data
 
 

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALETHEIA</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="logo-row">
+        <img src="../icons/icon48.png" alt="ALETHEIA" class="logo-icon">
+        <div>
+          <h1>ALETHEIA</h1>
+          <span class="subtitle">Digital Safety Shield</span>
+        </div>
+      </div>
+      <div class="status-row">
+        <span id="statusDot" class="status-dot active"></span>
+        <span id="statusText" class="status-text">Active Protection</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggleEnabled" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </header>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat">
+        <span class="stat-value" id="totalScanned">0</span>
+        <span class="stat-label">Scanned</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="totalFlagged">0</span>
+        <span class="stat-label">Flagged</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="currentPageFlags">0</span>
+        <span class="stat-label">This Page</span>
+      </div>
+    </div>
+
+    <!-- Flagged Items List -->
+    <div class="section-header">
+      <h2>Recent Alerts</h2>
+      <button id="btnRescan" class="btn-icon" title="Rescan page">&#x21bb;</button>
+    </div>
+    <div class="flagged-list" id="flaggedList">
+      <div class="empty-state">No threats detected yet. Browsing safely.</div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button id="btnDashboard" class="btn-primary">Open Dashboard</button>
+      <button id="btnWebDashboard" class="btn-secondary">Full Web Dashboard</button>
+    </div>
+
+    <!-- Settings Panel -->
+    <details class="settings-panel">
+      <summary>Settings</summary>
+      <div class="settings-content">
+        <div class="setting-row">
+          <label for="sensitivitySlider">Sensitivity</label>
+          <input type="range" id="sensitivitySlider" min="1" max="10" value="7">
+          <span id="sensitivityValue">7</span>
+        </div>
+        <div class="setting-row">
+          <label for="perspectiveKey">Perspective API Key</label>
+          <input type="text" id="perspectiveKey" placeholder="Enter API key (optional)">
+          <button id="btnSaveKey" class="btn-small">Save</button>
+        </div>
+        <div class="setting-row">
+          <button id="btnClearData" class="btn-danger">Clear All Data</button>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

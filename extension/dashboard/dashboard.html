@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALETHEIA Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Top Nav -->
+    <header class="top-bar">
+      <div class="brand">
+        <img src="../icons/icon48.png" alt="ALETHEIA" class="brand-icon">
+        <div>
+          <h1>ALETHEIA</h1>
+          <span class="brand-sub">Safety Dashboard</span>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button id="btnRefresh" class="btn-outline">Refresh</button>
+        <a href="http://localhost:5173" target="_blank" class="btn-outline">Full Web Dashboard</a>
+      </div>
+    </header>
+
+    <!-- Summary Cards -->
+    <section class="cards-row">
+      <div class="card">
+        <div class="card-icon" style="background: #2d1b69; color: #a855f7;">&#x1F6E1;</div>
+        <div class="card-body">
+          <span class="card-value" id="cardTotalScanned">0</span>
+          <span class="card-label">Total Scanned</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background: #7f1d1d; color: #fca5a5;">&#x26A0;</div>
+        <div class="card-body">
+          <span class="card-value" id="cardTotalFlagged">0</span>
+          <span class="card-label">Flagged Items</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background: #7c2d12; color: #fdba74;">&#x1F525;</div>
+        <div class="card-body">
+          <span class="card-value" id="cardHighSeverity">0</span>
+          <span class="card-label">High / Critical</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background: #14532d; color: #86efac;">&#x1F504;</div>
+        <div class="card-body">
+          <span class="card-value" id="cardRepeatOffenders">0</span>
+          <span class="card-label">Repeat Offenders</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+      <!-- Incidents Table -->
+      <section class="panel incidents-panel">
+        <div class="panel-header">
+          <h2>Flagged Content</h2>
+          <div class="filter-bar">
+            <select id="filterSeverity">
+              <option value="">All Severity</option>
+              <option value="CRITICAL">Critical</option>
+              <option value="HIGH">High</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="LOW">Low</option>
+            </select>
+            <select id="filterPlatform">
+              <option value="">All Platforms</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table id="incidentsTable">
+            <thead>
+              <tr>
+                <th>Platform</th>
+                <th>Content</th>
+                <th>Toxicity</th>
+                <th>Risk Score</th>
+                <th>Severity</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="incidentsBody">
+              <tr><td colspan="6" class="empty-cell">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Right Sidebar -->
+      <aside class="sidebar">
+        <!-- Trend Chart -->
+        <section class="panel">
+          <h2>Abuse Trend (24h)</h2>
+          <div class="chart-container">
+            <canvas id="trendChart" width="320" height="180"></canvas>
+          </div>
+        </section>
+
+        <!-- Platform Breakdown -->
+        <section class="panel">
+          <h2>Platform Breakdown</h2>
+          <div id="platformBreakdown" class="breakdown-list"></div>
+        </section>
+
+        <!-- Pattern Alerts -->
+        <section class="panel">
+          <h2>Pattern Alerts</h2>
+          <div id="patternAlerts" class="alerts-list">
+            <div class="empty-state-small">No patterns detected yet.</div>
+          </div>
+        </section>
+
+        <!-- Top Flagged Users -->
+        <section class="panel">
+          <h2>Top Flagged Users (Hashed)</h2>
+          <div id="topUsers" class="top-list"></div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
