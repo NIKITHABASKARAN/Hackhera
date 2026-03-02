@@ -69,3 +69,20 @@ def download_report(incident_id: str):
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
+
+@router.delete("/incidents/clear-unknown")
+def clear_unknown_incidents():
+    """Remove all incidents where platform or username is 'Unknown'."""
+    db = get_db()
+    result = db["incidents"].delete_many(
+        {"$or": [{"platform": "Unknown"}, {"username": "Unknown"}]}
+    )
+    return {"deleted": result.deleted_count}
+
+
+@router.delete("/incidents/clear-all")
+def clear_all_incidents():
+    """Remove all incidents from the collection."""
+    db = get_db()
+    result = db["incidents"].delete_many({})
+    return {"deleted": result.deleted_count}

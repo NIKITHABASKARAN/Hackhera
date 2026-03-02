@@ -1,11 +1,8 @@
 import React from "react";
-import { Link, NavLink, Route, Routes, useNavigate } from "react-router-dom";
+import { NavLink, Route, Routes } from "react-router-dom";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import UploadPage from "./pages/UploadPage.jsx";
 import CasePage from "./pages/CasePage.jsx";
-
-const navLinkClass = ({ isActive }) =>
-  isActive ? { textDecoration: "underline" } : undefined;
 
 export const API_BASE = "http://localhost:8000";
 
@@ -13,16 +10,34 @@ function App() {
   return (
     <>
       <header>
-        <h1>ALETHEIA – Women’s Digital Safety Dashboard</h1>
-        <nav>
-          <NavLink to="/" style={navLinkClass}>
-            Dashboard
-          </NavLink>
-          <NavLink to="/upload" style={navLinkClass}>
-            Upload Evidence
-          </NavLink>
-        </nav>
+        <div className="header-inner">
+          <div className="brand-block">
+            <div className="brand-shield">
+            <img src="/logo.png" alt="ALETHEIA" style={{ width: 30, height: 30, objectFit: "contain" }} />
+          </div>
+            <div className="brand-text">
+              <h1>ALETHEIA</h1>
+              <span className="tagline">Women's Digital Safety Platform</span>
+            </div>
+          </div>
+          <nav>
+            <NavLink
+              to="/"
+              end
+              className={({ isActive }) => (isActive ? "active" : undefined)}
+            >
+              📊 Dashboard
+            </NavLink>
+            <NavLink
+              to="/upload"
+              className={({ isActive }) => (isActive ? "active" : undefined)}
+            >
+              📤 Upload Evidence
+            </NavLink>
+          </nav>
+        </div>
       </header>
+
       <main>
         <Routes>
           <Route path="/" element={<DashboardPage />} />
@@ -30,17 +45,18 @@ function App() {
           <Route path="/case/:id" element={<CasePage />} />
         </Routes>
       </main>
+
       <footer>
         <small>
-          Backend runs at{" "}
+          Backend API at{" "}
           <a href="http://localhost:8000/docs" target="_blank" rel="noreferrer">
-            http://localhost:8000/docs
+            localhost:8000/docs
           </a>
-          . Mongo Express at{" "}
+          {" · "}
+          Mongo Express at{" "}
           <a href="http://localhost:8081" target="_blank" rel="noreferrer">
-            http://localhost:8081
+            localhost:8081
           </a>
-          .
         </small>
       </footer>
     </>
@@ -48,4 +64,3 @@ function App() {
 }
 
 export default App;
-

@@ -6,10 +6,10 @@ function apiUrl(path) {
 }
 
 const SEVERITY_COLOR = {
-  HIGH: "#c0392b",
-  MEDIUM: "#e67e22",
-  LOW: "#27ae60",
-  UNKNOWN: "#7f8c8d",
+  HIGH:    "#f43f5e",
+  MEDIUM:  "#fbbf24",
+  LOW:     "#34d399",
+  UNKNOWN: "#94a3b8",
 };
 
 const CATEGORY_LABEL = {
@@ -32,12 +32,12 @@ function CategoryBadge({ label }) {
     <span
       style={{
         display: "inline-block",
-        background: "#c0392b22",
-        border: "1px solid #c0392b",
-        color: "#c0392b",
-        borderRadius: 4,
-        padding: "2px 8px",
-        fontSize: "0.78rem",
+        background: "#fff1f2",
+        border: "1px solid #fecdd3",
+        color: "#be123c",
+        borderRadius: 6,
+        padding: "3px 10px",
+        fontSize: "0.76rem",
         margin: "2px 4px 2px 0",
         fontWeight: 600,
         letterSpacing: "0.02em",
@@ -53,13 +53,14 @@ function FlaggedWord({ word }) {
     <span
       style={{
         display: "inline-block",
-        background: "#fff3cd",
-        border: "1px solid #ffc107",
-        borderRadius: 3,
-        padding: "1px 6px",
-        fontSize: "0.78rem",
+        background: "#fffbeb",
+        border: "1px solid #fde68a",
+        borderRadius: 6,
+        padding: "2px 8px",
+        fontSize: "0.76rem",
         margin: "2px 3px 2px 0",
-        color: "#856404",
+        color: "#92400e",
+        fontWeight: 500,
       }}
     >
       {word}
@@ -119,8 +120,8 @@ function UploadPage() {
 
   return (
     <section className="panel">
-      <h2>Upload Screenshot / Image / Video</h2>
-      <p style={{ color: "#666", marginTop: 0, fontSize: "0.9rem" }}>
+      <h2>📤 Upload Screenshot / Image / Video</h2>
+      <p className="upload-description">
         Upload any screenshot or image — text inside the image will be
         automatically read via OCR and analysed for harassment, threats,
         doxxing, and more.
@@ -174,7 +175,7 @@ function UploadPage() {
         className={`result-box${result || error || submitting ? "" : " hidden"}`}
       >
         {submitting && <div>Reading image text and analysing…</div>}
-        {error && <div style={{ color: "#c0392b" }}>{error}</div>}
+        {error && <div style={{ color: "#be123c" }}>{error}</div>}
 
         {result && !submitting && !error && (
           <>
@@ -198,7 +199,7 @@ function UploadPage() {
                 <div style={{ fontWeight: 700, color: sevColor, fontSize: "1rem" }}>
                   Severity: {severity}
                 </div>
-                <div style={{ fontSize: "0.82rem", color: "#555" }}>
+                <div style={{ fontSize: "0.82rem", color: "var(--text3)" }}>
                   Toxicity score: {((result.toxicity_score || 0) * 100).toFixed(0)}%
                 </div>
               </div>
@@ -207,14 +208,14 @@ function UploadPage() {
             {/* ── Core flags ── */}
             <div className="result-row">
               <strong>Deepfake Detected:</strong>{" "}
-              <span style={{ color: result.deepfake_detected ? "#c0392b" : "#27ae60" }}>
-                {result.deepfake_detected ? "Yes" : "No"}
+              <span style={{ color: result.deepfake_detected ? "#be123c" : "#047857", fontWeight: 600 }}>
+                {result.deepfake_detected ? "⚠️ Yes" : "✅ No"}
               </span>
             </div>
             <div className="result-row">
               <strong>Harassment Detected:</strong>{" "}
-              <span style={{ color: result.harassment_detected ? "#c0392b" : "#27ae60" }}>
-                {result.harassment_detected ? "Yes" : "No"}
+              <span style={{ color: result.harassment_detected ? "#be123c" : "#047857", fontWeight: 600 }}>
+                {result.harassment_detected ? "⚠️ Yes" : "✅ No"}
               </span>
             </div>
             <div className="result-row">
@@ -254,11 +255,11 @@ function UploadPage() {
                 <strong>Text Read from Image (OCR):</strong>
                 <pre
                   style={{
-                    background: "#f8f9fa",
-                    border: "1px solid #dee2e6",
-                    borderRadius: 4,
-                    padding: "8px 10px",
-                    marginTop: 6,
+                    background: "#f8f9fb",
+                    border: "1px solid #e2e5ed",
+                    borderRadius: 8,
+                    padding: "10px 14px",
+                    marginTop: 8,
                     fontSize: "0.82rem",
                     whiteSpace: "pre-wrap",
                     wordBreak: "break-word",
@@ -266,13 +267,15 @@ function UploadPage() {
                     overflowY: "auto",
                     width: "100%",
                     boxSizing: "border-box",
+                    color: "#374151",
+                    fontFamily: "'Consolas', 'Courier New', monospace",
                   }}
                 >
                   {result.ocr_text}
                 </pre>
               </div>
             ) : (
-              <div className="result-row" style={{ color: "#888", fontSize: "0.85rem" }}>
+              <div className="result-row" style={{ color: "#9ca3af", fontSize: "0.85rem" }}>
                 {result.ocr_available
                   ? "No readable text found in image."
                   : "OCR unavailable — install Tesseract to enable image text reading."}

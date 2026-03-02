@@ -1,4 +1,4 @@
-const BACKEND_URL = "http://localhost:8000";
+const BACKEND_URL = "http://127.0.0.1:8000";
 const FLAGGED_STORAGE_KEY = "flaggedItems";
 const STATS_STORAGE_KEY = "scanStats";
 const MAX_FLAGGED_ITEMS = 200;
@@ -303,9 +303,12 @@ async function analyzeBatch(entries) {
       }
     }
 
-    reportToBackend(flaggedItem).catch(err => {
-      console.warn("[ALETHEIA BG] Backend report failed:", err.message);
-    });
+    reportToBackend(flaggedItem)
+      .then(() => syncPending())
+      .catch(err => {
+        console.warn("[ALETHEIA BG] Backend report failed:", err.message);
+        queueForSync(flaggedItem);
+      });
   }
 
   await updateStats(entries.length, flaggedCount);
@@ -315,6 +318,33 @@ async function analyzeBatch(entries) {
   await updateBadge(totalFlagged);
 }
 
+// ── Pending Sync Queue (when backend was offline) ──
+
+const PENDING_SYNC_KEY = "pendingSync";
+
+async function queueForSync(item) {
+  const result = await chrome.storage.local.get(PENDING_SYNC_KEY);
+  const queue = result[PENDING_SYNC_KEY] || [];
+  queue.push(item);
+  if (queue.length > 500) queue.length = 500;
+  await chrome.storage.local.set({ [PENDING_SYNC_KEY]: queue });
+}
+
+async function syncPending() {
+  const result = await chrome.storage.local.get(PENDING_SYNC_KEY);
+  const queue = result[PENDING_SYNC_KEY] || [];
+  if (!queue.length) return;
+  const remaining = [];
+  for (const item of queue) {
+    try {
+      await reportToBackend(item);
+    } catch {
+      remaining.push(item);
+    }
+  }
+  await chrome.storage.local.set({ [PENDING_SYNC_KEY]: remaining });
+}
+
 // ── Backend Reporting ──
 
 async function reportToBackend(flaggedItem) {
@@ -322,7 +352,7 @@ async function reportToBackend(flaggedItem) {
 
   const payload = {
     anonymous_reporter_id: anonymousId,
-    platform: flaggedItem.domain,
+    platform: flaggedItem.platform || flaggedItem.domain,
     username: flaggedItem.username,
     username_hash: flaggedItem.usernameHash,
     text: flaggedItem.text,
@@ -382,10 +412,35 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === "CLEAR_DATA") {
-    chrome.storage.local.remove([FLAGGED_STORAGE_KEY, STATS_STORAGE_KEY, "abusePatterns"]).then(() => {
+    chrome.storage.local.remove([FLAGGED_STORAGE_KEY, STATS_STORAGE_KEY, "abusePatterns", PENDING_SYNC_KEY]).then(() => {
       updateBadge(0);
       sendResponse({ success: true });
     });
+    return true;
+  }
+
+  if (message.type === "SYNC_TO_DASHBOARD") {
+    (async () => {
+      try {
+        const result = await chrome.storage.local.get(FLAGGED_STORAGE_KEY);
+        const items = result[FLAGGED_STORAGE_KEY] || [];
+        let synced = 0;
+        let failed = 0;
+        for (const item of items) {
+          try {
+            await reportToBackend(item);
+            synced++;
+          } catch {
+            failed++;
+          }
+        }
+        try { await syncPending(); } catch {}
+        sendResponse({ synced, failed, total: items.length });
+      } catch (err) {
+        console.error("[ALETHEIA BG] Sync error:", err);
+        sendResponse({ synced: 0, failed: 0, total: 0, error: err.message });
+      }
+    })();
     return true;
   }
 
@@ -406,11 +461,44 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+// ── Auto-Sync: push all unsent flagged items to backend ──
+
+async function autoSync() {
+  try {
+    const result = await chrome.storage.local.get(FLAGGED_STORAGE_KEY);
+    const items = result[FLAGGED_STORAGE_KEY] || [];
+    if (!items.length) return;
+    let synced = 0;
+    for (const item of items) {
+      try {
+        await reportToBackend(item);
+        synced++;
+      } catch {
+        break;
+      }
+    }
+    if (synced > 0) {
+      console.log(`[ALETHEIA] Auto-synced ${synced} items to backend`);
+    }
+    try { await syncPending(); } catch {}
+  } catch (err) {
+    console.warn("[ALETHEIA] Auto-sync failed:", err.message);
+  }
+}
+
 // ── Notification Click Handler ──
 
 chrome.notifications.onClicked.addListener((notificationId) => {
   chrome.tabs.create({ url: chrome.runtime.getURL("dashboard/dashboard.html") });
   chrome.notifications.clear(notificationId);
+});
+
+// ── Periodic Sync Alarm ──
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === "autoSync") {
+    autoSync();
+  }
 });
 
 // ── Install / Startup ──
@@ -419,8 +507,12 @@ chrome.runtime.onInstalled.addListener(() => {
   console.log("[ALETHEIA] Extension installed");
   chrome.storage.local.set({ extensionEnabled: true });
   updateBadge(0);
+  chrome.alarms.create("autoSync", { delayInMinutes: 0.5, periodInMinutes: 2 });
+  autoSync();
 });
 
 chrome.runtime.onStartup.addListener(() => {
   ensureOffscreen();
+  chrome.alarms.create("autoSync", { delayInMinutes: 0.5, periodInMinutes: 2 });
+  autoSync();
 });

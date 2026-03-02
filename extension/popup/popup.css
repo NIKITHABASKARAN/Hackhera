@@ -310,8 +310,39 @@ body {
 /* Buttons */
 .actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+}
+
+.btn-sync {
+  width: 100%;
+  padding: 8px 12px;
+  background: #2d1b69;
+  color: #c4b5fd;
+  border: 1px solid #7c3aed;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-sync:hover {
+  background: #3d2b79;
+  color: #e9d5ff;
+}
+
+.btn-sync:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sync-status {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-bottom: 8px;
+  min-height: 16px;
 }
 
 .btn-primary,

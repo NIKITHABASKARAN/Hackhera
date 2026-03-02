@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const totalFlagged = document.getElementById("totalFlagged");
   const currentPageFlags = document.getElementById("currentPageFlags");
   const flaggedList = document.getElementById("flaggedList");
+  const btnSync = document.getElementById("btnSync");
+  const syncStatus = document.getElementById("syncStatus");
   const btnDashboard = document.getElementById("btnDashboard");
   const btnWebDashboard = document.getElementById("btnWebDashboard");
   const btnRescan = document.getElementById("btnRescan");
@@ -139,6 +141,32 @@ document.addEventListener("DOMContentLoaded", () => {
       if (tabs[0]) {
         chrome.tabs.sendMessage(tabs[0].id, { type: "TOGGLE_EXTENSION", enabled });
       }
+    });
+  });
+
+  btnSync.addEventListener("click", () => {
+    btnSync.disabled = true;
+    syncStatus.textContent = "Syncing...";
+    chrome.runtime.sendMessage({ type: "SYNC_TO_DASHBOARD" }, (response) => {
+      btnSync.disabled = false;
+      if (chrome.runtime.lastError || !response) {
+        syncStatus.textContent = "Sync failed — extension error. Try reloading.";
+        return;
+      }
+      const { synced, failed, total, error } = response;
+      if (error) {
+        syncStatus.textContent = `Sync error: ${error}`;
+      } else if (total === 0) {
+        syncStatus.textContent = "Nothing to sync.";
+      } else if (failed > 0 && synced === 0) {
+        syncStatus.textContent = `All ${total} failed. Is backend running on port 8000?`;
+      } else if (failed > 0) {
+        syncStatus.textContent = `Synced ${synced} / ${total} (${failed} failed).`;
+      } else {
+        syncStatus.textContent = `Synced ${synced} / ${total} items!`;
+      }
+      loadStats();
+      setTimeout(() => { syncStatus.textContent = ""; }, 4000);
     });
   });
 

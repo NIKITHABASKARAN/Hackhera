@@ -29,6 +29,21 @@ class ExtensionReport(BaseModel):
 def submit_report(report: ExtensionReport):
     db = get_db()
 
+    # Deduplicate: avoid duplicate rows when extension re-syncs stored items
+    existing = db["extension_reports"].find_one(
+        {
+            "anonymous_reporter_id": report.anonymous_reporter_id,
+            "username_hash": report.username_hash,
+            "text": report.text or "",
+        }
+    )
+    if existing:
+        return {
+            "status": "already_reported",
+            "report_id": str(existing["_id"]),
+            "repeat_offender": existing.get("repeat_offender_flag", False),
+        }
+
     report_doc = {
         "anonymous_reporter_id": report.anonymous_reporter_id,
         "platform": report.platform,
